@@ -1,8 +1,9 @@
 class NeuralNetwork:
     # What:
+    # Highlight the two main “modes” of machine learning.
     # Simplified examples of how neural networks work
     #   Supervised learning
-    #       What it shows: A tiny neural network that learns by comparing predictions to known outputs.
+    #       What it shows: A tiny neural network that learns by comparing predictions to known outputs (labels).
     #       Key mechanism:
     #           Forward pass: weighted sum → sigmoid activation.
     #           Backward pass: error → gradient → weight updates.
@@ -10,7 +11,7 @@ class NeuralNetwork:
     #           Sigmoid derivative — because it’s the slope that tells the network how much to adjust when learning.
     #       Analogy: Like practicing math problems with an answer key — you know the right outputs, and you adjust until your guesses match.
     #   Unsupervised learning
-    #       What it shows: Grouping points into clusters without knowing the outputs.
+    #       What it shows: Grouping points into clusters without knowing the outputs (no labels).
     #       Key mechanism:
     #           Assign points to nearest center.
     #           Update centers to the average of their points.
@@ -71,6 +72,7 @@ class NeuralNetwork:
             [1, 1]
         ]
         y = [0, 0, 0, 1, 0, 1]  # AND outputs (labels)
+        # y = [0, 1, 0, 1, 0, 0]  # Experiment: wrong output
 
         # --- Helper functions ---
         # Squashes any number into a value between 0 and 1.
