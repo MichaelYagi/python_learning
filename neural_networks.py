@@ -9,7 +9,19 @@ class NeuralNetwork:
     #           Backward pass: error → gradient → weight updates.
     #       Most important concept:
     #           Sigmoid derivative — because it’s the slope that tells the network how much to adjust when learning.
-    #       Analogy: Like practicing math problems with an answer key — you know the right outputs, and you adjust until your guesses match.
+    #       Big Picture: I know the answers, teach me to match them. — you know the right outputs, and you adjust until your guesses match.
+    #           Inputs (X) ---> [Neuron: w1*x1 + w2*x2 + b] ---> Sigmoid ---> Prediction
+    #                   |                                                |
+    #                   |                                                v
+    #                   |---------------------------------------> Compare with Target (y)
+    #                                                                 |
+    #                                                                 v
+    #                                                         Error + Gradient
+    #                                                                 |
+    #                                                                 v
+    #                                                         Update weights/bias
+    #            Needs inputs + known outputs (labels).
+    #            Learns by reducing error using the sigmoid derivative.
     #   Unsupervised learning
     #       What it shows: Grouping points into clusters without knowing the outputs (no labels).
     #       Key mechanism:
@@ -18,7 +30,13 @@ class NeuralNetwork:
     #           Repeat until stable.
     #       Most important concept:
     #           K-means clustering — because it’s the simplest way to see how unsupervised learning organizes data by similarity.
-    #       Analogy: Like sorting puzzle pieces by color/shape without knowing the final picture — the groups emerge naturally.
+    #       Analogy: I don’t know the answers, just show me the natural groups — the groups emerge naturally.
+    #           Inputs (points) ---> Assign to nearest center ---> Update center (mean)
+    #                   |                                                        |
+    #                   |                                                        v
+    #                   |-------------------------------------------- Repeat until stable
+    #           Needs inputs only (no labels).
+    #           Learns by grouping points by distance.
     # ---------------------------------------------------------------------------------------------------------------------------
     # Terms:
     # Weight: An adjustable number multiplying an input, telling the model how important that input is
