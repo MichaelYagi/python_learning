@@ -247,8 +247,8 @@ class PerceptualHashing:
 # ****************************************** INTEGRATION ******************************************
 
 # DEFINE 2 FILE PATHS TO IMAGE TO COMPARE
-filepath1 = "<image_path_1>"
-filepath2 = "<image_path_2>"
+filepath1 = "C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\DSC00169.JPG"
+filepath2 = "C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\DSC00170.JPG"
 img1 = Image.open(filepath1)
 img2 = Image.open(filepath2)
 
@@ -262,24 +262,29 @@ print("-----------------\n")
 ph1 = PerceptualHashing(img1, resolution)
 ph2 = PerceptualHashing(img2, resolution)
 
+print("ahash image 1")
 h1 = ph1.ahash()
+print("ahash image 2")
 h2 = ph2.ahash()
 print("ahash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
 print("ahash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
 print("ahash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
 print("-----------------\n")
 
+print("dhash image 1")
 h1 = ph1.dhash()
+print("dhash image 2")
 h2 = ph2.dhash()
 print("dhash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
 print("dhash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
 print("dhash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
 print("-----------------\n")
 
+print("phash image 1")
 h1 = ph1.phash()
+print("phash image 2")
 h2 = ph2.phash()
 print("phash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
 print("phash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
 print("phash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
 print("-----------------")
-
