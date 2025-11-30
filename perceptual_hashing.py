@@ -1,6 +1,3 @@
-import time
-from ftplib import print_line
-
 from PIL import Image
 import numpy as np
 import scipy.fftpack
@@ -201,7 +198,34 @@ class PerceptualHashing:
         """
         Compute similarity percentage between two hashes to two decimal places.
         """
-        distance = PerceptiveHash.hamming_distance(my_hash, other_hash)
+        distance = PerceptualHashing.hamming_distance(my_hash, other_hash)
         total_bits = hash_size * hash_size
         similarity = ((total_bits - distance) / total_bits) * 100
         return round(similarity, 2)
+
+
+# DEFINE 2 FILE PATHS TO IMAGE TO COMPARE
+img1 = Image.open("<image_path_1>")
+img2 = Image.open("<image_path_2>")
+
+resolution = 32
+ph1 = PerceptualHashing(img1, resolution)
+ph2 = PerceptualHashing(img2, resolution)
+
+h1 = ph1.ahash()
+h2 = ph2.ahash()
+print("ahash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
+print("ahash similarity:", PerceptualHashing.similarity_percentage(h1, h2), "%")
+print("-----------------")
+
+h1 = ph1.dhash()
+h2 = ph2.dhash()
+print("dhash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
+print("dhash similarity:", PerceptualHashing.similarity_percentage(h1, h2), "%")
+print("-----------------")
+
+h1 = ph1.phash()
+h2 = ph2.phash()
+print("phash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
+print("phash himilarity:", PerceptualHashing.similarity_percentage(h1, h2), "%")
+print("-----------------")
