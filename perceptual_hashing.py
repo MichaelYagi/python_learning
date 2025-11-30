@@ -121,18 +121,16 @@ class PerceptualHashing:
 
         # Step 3: Apply 2D Discrete Cosine Transform (DCT)
         # The Discrete Cosine Transform (DCT) re‑expresses that grid not in terms of pixels, but in terms of patterns of variation across the grid.
-        # Low frequency = slow, gradual changes in brightness (big shapes, smooth gradients).
-        # High frequency = rapid changes in brightness (edges, fine details, noise).
+        # Low frequency = slow, gradual changes in brightness (big shapes, smooth gradients). The basic shape of the image and a little blurred.
+        # High frequency = rapid changes in brightness (edges, fine details, noise). The edges and noise, final result can be just noise captured.
         # [ 50, 52, 55, 58, 60, 62, 65, 68 ] row of pixels and is a smooth gradient → mostly low frequency.
         # [ 50, 200, 50, 200, 50, 200, 50, 200 ] row of pixels and is a sharp gradient → mostly high frequency.
-        # Low frequencies capture the overall structure of the image (shapes, layout).
-        # High frequencies are easily changed by noise, compression, or small edits.
         # By keeping only the low‑frequency coefficients, pHash builds a fingerprint that’s stable across edits but still unique to the image.
         # pixels.T: transpose → flips rows and columns.
         # scipy.fftpack.dct(..., norm='ortho'): applies the Discrete Cosine Transform (DCT).
         # First DCT is applied to columns (pixels.T).
         # Then transpose back and apply DCT to rows.
-        # Each entry is a frequency coefficient: how much of a certain “wave pattern” exists in the image.
+        # Each entry is a frequency coefficient (number that multiplies a variable in an algebraic expression): how much of a certain “wave pattern” exists in the image.
         # Top‑left corner = low frequencies (broad shapes).
         # Bottom‑right corner = high frequencies (fine details, noise).
         dct = scipy.fftpack.dct(scipy.fftpack.dct(pixels.T, norm='ortho').T, norm='ortho')
