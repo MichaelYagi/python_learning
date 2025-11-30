@@ -4,13 +4,10 @@ import scipy.fftpack
 
 # Average hashing, difference hashing and perceptive hashing algorithms
 class PerceptualHashing:
-    def __init__(self, image: Image.Image, hash_size: int = 8, highfreq_factor: int = 4):
+    def __init__(self, image: Image.Image, resolution_value: int = 64, highfreq_factor: int = 4):
         self.image = image  # Initialize the 'image' attribute
-        self.hash_size = hash_size  # Initialize the 'hash_size' attribute, determines image size by pixels hash_size x hash_size
+        self.hash_size = int(resolution_value/8)  # Initialize the 'hash_size' attribute, determines image size by pixels hash_size x hash_size
         self.highfreq_factor = highfreq_factor
-
-    def set_hash_size(self, hash_size: int) -> None:
-        self.hash_size = hash_size
 
     def ahash(self) -> int:
         """
@@ -194,10 +191,15 @@ class PerceptualHashing:
         return (my_hash ^ other_hash).bit_count()
 
     @staticmethod
-    def similarity_percentage(my_hash: int, other_hash: int, hash_size: int = 8) -> float:
+    def normalized_hamming_distance(my_hash: int, other_hash: int, resolution_value: int = 64) -> float:
+        return 100-PerceptualHashing.similarity_percentage(my_hash, other_hash, resolution_value)
+
+    @staticmethod
+    def similarity_percentage(my_hash: int, other_hash: int, resolution_value: int = 64) -> float:
         """
         Compute similarity percentage between two hashes to two decimal places.
         """
+        hash_size = resolution_value/8
         distance = PerceptualHashing.hamming_distance(my_hash, other_hash)
         total_bits = hash_size * hash_size
         similarity = ((total_bits - distance) / total_bits) * 100
@@ -208,24 +210,28 @@ class PerceptualHashing:
 img1 = Image.open("<image_path_1>")
 img2 = Image.open("<image_path_2>")
 
-resolution = 32
+resolution = 64 # Adjust as desired. Must be divisible by 8 and > than 8
+
 ph1 = PerceptualHashing(img1, resolution)
 ph2 = PerceptualHashing(img2, resolution)
 
 h1 = ph1.ahash()
 h2 = ph2.ahash()
 print("ahash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
-print("ahash similarity:", PerceptualHashing.similarity_percentage(h1, h2), "%")
+print("ahash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
+print("ahash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
 print("-----------------")
 
 h1 = ph1.dhash()
 h2 = ph2.dhash()
 print("dhash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
-print("dhash similarity:", PerceptualHashing.similarity_percentage(h1, h2), "%")
+print("dhash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
+print("dhash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
 print("-----------------")
 
 h1 = ph1.phash()
 h2 = ph2.phash()
 print("phash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
-print("phash himilarity:", PerceptualHashing.similarity_percentage(h1, h2), "%")
+print("phash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
+print("phash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
 print("-----------------")
