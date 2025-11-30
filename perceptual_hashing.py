@@ -205,6 +205,7 @@ class PerceptualHashing:
         similarity = ((total_bits - distance) / total_bits) * 100
         return round(similarity, 2)
 
+# ****************************************** EXAMPLE ******************************************
 
 # DEFINE 2 FILE PATHS TO IMAGE TO COMPARE
 img1 = Image.open("<image_path_1>")
