@@ -244,14 +244,12 @@ class PerceptualHashing:
         similarity = ((total_bits - distance) / total_bits) * 100
         return round(similarity, 2)
 
-# ****************************************** EXAMPLE ******************************************
+# ****************************************** INTEGRATION ******************************************
 
 # DEFINE 2 FILE PATHS TO IMAGE TO COMPARE
-filepath1 = "C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\DSC00169.JPG"
-filepath2 = "C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\DSC00170.JPG"
-# img1 = Image.open("C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\IMG_20181215_161431-edited.jpg")
+filepath1 = "<image_path_1>"
+filepath2 = "<image_path_2>"
 img1 = Image.open(filepath1)
-# img2 = Image.open("C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\IMG_20181215_161431.jpg")
 img2 = Image.open(filepath2)
 
 resolution = 64 # Adjust as desired. Must be divisible by 8 and > than 8
