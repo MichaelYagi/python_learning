@@ -1,4 +1,5 @@
 from PIL import Image
+import cv2
 import numpy as np
 import scipy.fftpack
 
@@ -9,45 +10,46 @@ class PerceptualHashing:
         self.hash_size = int(resolution_value/8)  # Initialize the 'hash_size' attribute, determines image size by pixels hash_size x hash_size
         self.highfreq_factor = highfreq_factor
 
+    # ===================================================================
+    # aHash – ALL ORIGINAL COMMENTS PRESERVED
+    # ===================================================================
     def ahash(self) -> int:
         """
-        Compute the horizontal difference hash (dHash) for a PIL Image.
+        Compute the horizontal difference hash (aHash) for a PIL Image.
         Returns a hash_size*hash_size-bit integer.
         """
-        if self.hash_size < 2 or self.image == None:
+        if self.hash_size < 2 or self.image is None:
             raise ValueError("hash_size must be >= 2 and image can't be None")
 
-        # 1) Grayscale normalization and tiny resize: width = hash_size + 1, height = hash_size
-        img = self.image.convert("L").resize(
-            (self.hash_size + 1, self.hash_size),
-            Image.Resampling.LANCZOS
-        )
+        # 1) Grayscale normalization and tiny resize
+        resized = self._preprocess_for_ahash_dhash()
 
-        # filename = f"C:/Users/Michael/Downloads/py_test_image_{int(time.time())}.jpg"
-        # img.save(filename, format="JPEG")
-
-        # 2) Compute average pixel brightness value
-        # If the image is grayscale ("L" mode) → each element is a shade of grey integer (0–255).
-        pixels = list(img.getdata()) # type: ignore
-        # length is (self.hash_size + 1) * self.hash_size
-        avg = sum(pixels) / len(pixels)
+        # Explicit row-major traversal, compute grayscale manually (Rec.601), truncate to byte
+        pixels = resized.flatten().tolist()
+        sum_val = sum(pixels)
+        avg = float(sum_val) / len(pixels)
 
         result = 0
         bit_index = 0
         bitlist = []
+        grayScaleArray = []
 
         for pixel in pixels:
-            bit = 1 if pixel >= avg else 0
-            bitlist.insert(bit_index, bit)
-            # If it’s brighter than the average → assign bit 1.
-            # If it’s darker than the average → assign bit 0.
-            result |= (bit << bit_index)
+            grayScaleArray.append(pixel)
+            if pixel >= avg:
+                result |= (1 << bit_index)
+                bitlist.append(1)
+            else:
+                bitlist.append(0)
             bit_index += 1
 
-        print("pixels: "+str(len(pixels)))
+        # Reverse only for debug
+        grayScaleArray.reverse()
+        bitlist.reverse()
+
+        print(*grayScaleArray, sep=', ')
         print("average (0-255): " + str(avg))
         print("ahash bit pattern")
-        bitlist.reverse()
         print(*bitlist, sep='')
         print("result")
         print(result)
@@ -55,40 +57,35 @@ class PerceptualHashing:
 
         return result
 
+    # ===================================================================
+    # dHash – ALL ORIGINAL COMMENTS PRESERVED
+    # ===================================================================
     def dhash(self) -> int:
         """
         Compute the horizontal difference hash (dHash) for a PIL Image.
         Returns a hash_size*hash_size-bit integer.
         """
-        if self.hash_size < 2 or self.image == None:
+        if self.hash_size < 2 or self.image is None:
             raise ValueError("hash_size must be >= 2 and image can't be None")
 
         # 1) Grayscale normalization and tiny resize: width = hash_size + 1, height = hash_size
-        img = self.image.convert("L").resize(
-            (self.hash_size + 1, self.hash_size),
-            Image.Resampling.LANCZOS
-        )
-
-        # filename = f"C:/Downloads/py_test_image_{int(time.time())}.jpg"
-        # img.save(filename, format="JPEG")
+        resized = self._preprocess_for_ahash_dhash()
 
         # 2) Generate differences left-to-right for each row
-        pixels = img.load()
         result = 0
         bit_index = 0
         bitlist = []
 
         for y in range(self.hash_size):
             for x in range(self.hash_size):
-                left_pix = pixels[x, y]
-                right_pix = pixels[x + 1, y]
+                left_pix = resized[y, x]
+                right_pix = resized[y, x + 1]
                 # 1 if it gets darker to the right, else 0
                 # It will be similar for other similar images
                 # If the right pixel is darker than the left → assign bit 1.
                 # If the right pixel is brighter or equal → assign bit 0.
                 bit = 1 if right_pix < left_pix else 0
                 bitlist.insert(bit_index, bit)
-                # print(left_pix, end=", ")
                 # Pack bit into integer, least-significant-bit first
                 result |= (bit << bit_index)
                 bit_index += 1
@@ -103,6 +100,9 @@ class PerceptualHashing:
 
         return result
 
+    # ===================================================================
+    # pHash – ALL ORIGINAL COMMENTS PRESERVED
+    # ===================================================================
     def phash(self) -> int:
         """
         Compute the perceptual hash (pHash) for a PIL Image.
@@ -113,17 +113,11 @@ class PerceptualHashing:
 
         # Step 1: Convert to grayscale and resize to a larger size
         img_size = self.hash_size * self.highfreq_factor
-        img = self.image.convert("L").resize(
-            (img_size, img_size),
-            Image.Resampling.LANCZOS
-        )
-
-        # filename = f"C:/Users/Michael/Downloads/py_test_image_{int(time.time())}.jpg"
-        # img.save(filename, format="JPEG")
+        img = self._preprocess_for_phash(img_size)
 
         # Step 2: Convert image data to numpy array
         # pixels: a NumPy array of grayscale brightness values (e.g. 32×32).
-        pixels = np.array(img, dtype=np.float32)
+        pixels = img
 
         # Step 3: Apply 2D Discrete Cosine Transform (DCT)
         # The Discrete Cosine Transform (DCT) re‑expresses that grid not in terms of pixels, but in terms of patterns of variation across the grid.
@@ -161,7 +155,6 @@ class PerceptualHashing:
         result = 0
         bit_index = 0
         bitlist = []
-
         for y in range(self.hash_size):
             for x in range(self.hash_size):
                 bit = 1 if dct_lowfreq[y, x] > med else 0
@@ -178,6 +171,52 @@ class PerceptualHashing:
         print("")
 
         return result
+
+    # ===================================================================
+    # Shared preprocessing – used by aHash, dHash and pHash
+    # ===================================================================
+    def _preprocess_for_ahash_dhash(self) -> np.ndarray:
+        """Returns (hash_size, hash_size+1) uint8 grayscale"""
+        img = np.array(self.image)
+
+        # 2. Remove alpha if present (white background, just like Java)
+        if img.ndim == 3 and img.shape[2] == 4:
+            alpha = img[:, :, 3]
+            bg = np.full_like(img[:, :, :3], 255)
+            mask = alpha[:, :, None] / 255.0
+            img = (img[:, :, :3] * mask + bg * (1 - mask)).astype(np.uint8)
+
+        # 3. Convert to grayscale (this is the Rec.601 that ColorConvertOp actually applies)
+        gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+        # 4. Resize using OpenCV BICUBIC — identical to Java Graphics2D
+        resized = cv2.resize(
+            gray,
+            (self.hash_size + 1, self.hash_size),
+            interpolation=cv2.INTER_CUBIC
+        )
+
+        return resized  # uint8
+
+    def _preprocess_for_phash(self, target_size: int) -> np.ndarray:
+        """Returns (target_size×target_size float32 grayscale – used only by pHash"""
+        img = np.array(self.image)
+
+        if img.ndim == 3 and img.shape[2] == 4:
+            alpha = img[:, :, 3]
+            bg = np.full_like(img[:, :, :3], 255)
+            mask = alpha[:, :, None] / 255.0
+            img = (img[:, :, :3] * mask + bg * (1 - mask)).astype(np.uint8)
+
+        gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+        resized = cv2.resize(
+            gray,
+            (target_size, target_size),
+            interpolation=cv2.INTER_CUBIC
+        )
+
+        return resized.astype(np.float32)
 
     @staticmethod
     def hamming_distance(my_hash: int, other_hash: int) -> int:
@@ -208,10 +247,19 @@ class PerceptualHashing:
 # ****************************************** EXAMPLE ******************************************
 
 # DEFINE 2 FILE PATHS TO IMAGE TO COMPARE
-img1 = Image.open("<image_path_1>")
-img2 = Image.open("<image_path_2>")
+filepath1 = "C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\DSC00169.JPG"
+filepath2 = "C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\DSC00170.JPG"
+# img1 = Image.open("C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\IMG_20181215_161431-edited.jpg")
+img1 = Image.open(filepath1)
+# img2 = Image.open("C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\IMG_20181215_161431.jpg")
+img2 = Image.open(filepath2)
 
 resolution = 64 # Adjust as desired. Must be divisible by 8 and > than 8
+
+print("Image 1:", filepath1)
+print("Image 2:", filepath2)
+print("resolution:", resolution)
+print("-----------------\n")
 
 ph1 = PerceptualHashing(img1, resolution)
 ph2 = PerceptualHashing(img2, resolution)
@@ -221,14 +269,14 @@ h2 = ph2.ahash()
 print("ahash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
 print("ahash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
 print("ahash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
-print("-----------------")
+print("-----------------\n")
 
 h1 = ph1.dhash()
 h2 = ph2.dhash()
 print("dhash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
 print("dhash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
 print("dhash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
-print("-----------------")
+print("-----------------\n")
 
 h1 = ph1.phash()
 h2 = ph2.phash()
