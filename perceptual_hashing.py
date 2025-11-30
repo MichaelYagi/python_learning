@@ -47,7 +47,7 @@ class PerceptualHashing:
         grayScaleArray.reverse()
         bitlist.reverse()
 
-        print(*grayScaleArray, sep=', ')
+        # print(*grayScaleArray, sep=', ')
         print("average (0-255): " + str(avg))
         print("ahash bit pattern")
         print(*bitlist, sep='')
@@ -282,3 +282,4 @@ print("phash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
 print("phash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
 print("phash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
 print("-----------------")
+
