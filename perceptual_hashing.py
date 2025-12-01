@@ -245,8 +245,8 @@ class PerceptualHashing:
 # ****************************************** INTEGRATION ******************************************
 
 # DEFINE 2 FILE PATHS TO IMAGE TO COMPARE
-filepath1 = "C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\DSC00169.JPG"
-filepath2 = "C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\DSC00170.JPG"
+filepath1 = "<image_path_1>"
+filepath2 = "<image_path_2>"
 img1 = Image.open(filepath1)
 img2 = Image.open(filepath2)
 
@@ -286,3 +286,4 @@ print("phash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
 print("phash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
 print("phash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
 print("-----------------")
+
