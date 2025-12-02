@@ -11,7 +11,7 @@ class PerceptualHashing:
         self.highfreq_factor = highfreq_factor
 
     # ===================================================================
-    # aHash – ALL ORIGINAL COMMENTS PRESERVED
+    # aHash
     # ===================================================================
     def ahash(self) -> int:
         """
@@ -58,7 +58,7 @@ class PerceptualHashing:
         return result
 
     # ===================================================================
-    # dHash – ALL ORIGINAL COMMENTS PRESERVED
+    # dHash
     # ===================================================================
     def dhash(self) -> int:
         """
@@ -101,8 +101,14 @@ class PerceptualHashing:
         return result
 
     # ===================================================================
-    # pHash – ALL ORIGINAL COMMENTS PRESERVED
+    # pHash
     # ===================================================================
+    # Each 8×8 block of an image is expressed as a weighted sum of all 64 fixed patterns (https://www.researchgate.net/profile/Sourabh-Debnath/publication/371032523/figure/fig1/AS:11431281213776559@1703167586659/All-variations-of-discrete-cosine-transform.ppm)
+    # eg. DCT pattern https://michaelyagi.github.io/images/DCT_patterns_for_image.png for https://michaelyagi.github.io/images/random_pallet.png
+    # The patterns are universal, but what makes each block unique are the weights (coefficients)
+    # Without weights, every block would look the same (look like a uniform grey block) — the coefficients are what differentiate them
+    # Heavy weight = pattern that is more visible in the final block
+    # The final block is the superposition of all 64 weighted patterns
     def phash(self) -> int:
         """
         Compute the perceptual hash (pHash) for a PIL Image.
@@ -245,12 +251,13 @@ class PerceptualHashing:
 # ****************************************** INTEGRATION ******************************************
 
 # DEFINE 2 FILE PATHS TO IMAGE TO COMPARE
-filepath1 = "<image_path_1>"
-filepath2 = "<image_path_2>"
+filepath1 = "C:\\Users\\Michael\\Downloads\\testpics\\dupetest\\DSC00169.JPG"
+filepath2 = "C:\\Users\\Michael\\Downloads\\testpics\\005_Aug_22__1984.jpg"
 img1 = Image.open(filepath1)
 img2 = Image.open(filepath2)
 
-resolution = 64 # Adjust as desired. Must be divisible by 8 and > than 8
+resolution = 256
+# Adjust as desired. Must be divisible by 8 and > than 8
 
 print("Image 1:", filepath1)
 print("Image 2:", filepath2)
@@ -286,4 +293,3 @@ print("phash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
 print("phash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
 print("phash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
 print("-----------------")
-
