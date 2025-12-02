@@ -168,6 +168,7 @@ class PerceptualHashing:
                 bit_index += 1
 
         print("hash size: " + str(self.hash_size))
+        print("median: " + str(med))
         print("phash bit pattern")
         bitlist.reverse()
         print(*bitlist, sep='')
@@ -251,23 +252,39 @@ class PerceptualHashing:
 
 # ****************************************** INTEGRATION ******************************************
 
+print("\n============== Configuration ==============")
 # DEFINE 2 FILE PATHS TO IMAGE TO COMPARE
-filepath1 = "<image_path_1>"
-filepath2 = "<image_path_2>"
-img1 = Image.open(filepath1)
-img2 = Image.open(filepath2)
+imagepath1 = "<image_path_1>"
+imagepath2 = "<image_path_2>"
+# RESOLUTION - Adjust as desired. Must be divisible and greater > 8
+resolution = 64
 
-resolution = 256
-# Adjust as desired. Must be divisible by 8 and > than 8
+try:
+    with Image.open(imagepath1) as img:
+        img.verify()  # verifies image integrity
+except (FileNotFoundError, IOError):
+    print("Image 1 does not exist or is invalid.")
+    exit()
 
-print("Image 1:", filepath1)
-print("Image 2:", filepath2)
+img1 = Image.open(imagepath1)
+
+try:
+    with Image.open(imagepath2) as img:
+        img.verify()  # verifies image integrity
+except (FileNotFoundError, IOError):
+    print("Image 2 does not exist or is invalid.")
+    exit()
+
+img2 = Image.open(imagepath2)
+
+print("Image 1:", imagepath1)
+print("Image 2:", imagepath2)
 print("resolution:", resolution)
-print("-----------------\n")
 
 ph1 = PerceptualHashing(img1, resolution)
 ph2 = PerceptualHashing(img2, resolution)
 
+print("\n============== ahash ==============")
 print("ahash image 1")
 h1 = ph1.ahash()
 print("ahash image 2")
@@ -275,8 +292,8 @@ h2 = ph2.ahash()
 print("ahash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
 print("ahash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
 print("ahash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
-print("-----------------\n")
 
+print("\n============== dhash ==============")
 print("dhash image 1")
 h1 = ph1.dhash()
 print("dhash image 2")
@@ -284,8 +301,8 @@ h2 = ph2.dhash()
 print("dhash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
 print("dhash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
 print("dhash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
-print("-----------------\n")
 
+print("\n============== phash ==============")
 print("phash image 1")
 h1 = ph1.phash()
 print("phash image 2")
@@ -293,4 +310,3 @@ h2 = ph2.phash()
 print("phash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
 print("phash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
 print("phash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
-print("-----------------")
