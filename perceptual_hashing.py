@@ -103,10 +103,11 @@ class PerceptualHashing:
     # ===================================================================
     # pHash
     # ===================================================================
-    # Each 8×8 block of an image is expressed as a weighted sum of all 64 fixed patterns (https://www.researchgate.net/profile/Sourabh-Debnath/publication/371032523/figure/fig1/AS:11431281213776559@1703167586659/All-variations-of-discrete-cosine-transform.ppm)
+    # Each hash_size x hash_size (eg. 8×8) block of an image is expressed as a weighted sum of all (eg. 64) fixed patterns
+    # https://upload.wikimedia.org/wikipedia/commons/2/24/DCT-8x8.png and https://upload.wikimedia.org/wikipedia/commons/6/60/DCT-16x16.png examples
     # eg. DCT pattern https://michaelyagi.github.io/images/DCT_patterns_for_image.png for https://michaelyagi.github.io/images/random_pallet.png
     # The patterns are universal, but what makes each block unique are the weights (coefficients)
-    # Without weights, every block would look the same (look like a uniform grey block) — the coefficients are what differentiate them
+    # Without weights, every block would look the same as uniform grey block — the coefficients are what differentiate them
     # Heavy weight = pattern that is more visible in the final block
     # The final block is the superposition of all 64 weighted patterns
     def phash(self) -> int:
@@ -126,7 +127,7 @@ class PerceptualHashing:
         pixels = img
 
         # Step 3: Apply 2D Discrete Cosine Transform (DCT)
-        # The Discrete Cosine Transform (DCT) re‑expresses that grid not in terms of pixels, but in terms of patterns of variation across the grid.
+        # The Discrete Cosine Transform (DCT) re‑expresses that grid not in terms of pixels, but in terms of a set of patterns of variation across a grid.
         # Low frequency = slow, gradual changes in brightness (big shapes, smooth gradients). The basic shape of the image and a little blurred.
         # High frequency = rapid changes in brightness (edges, fine details, noise). The edges and noise, final result can be just noise captured.
         # [ 50, 52, 55, 58, 60, 62, 65, 68 ] row of pixels and is a smooth gradient → mostly low frequency.
@@ -293,4 +294,3 @@ print("phash hamming distance:", PerceptualHashing.hamming_distance(h1, h2))
 print("phash normalized hamming distance:", PerceptualHashing.normalized_hamming_distance(h1, h2, resolution))
 print("phash similarity:", PerceptualHashing.similarity_percentage(h1, h2, resolution), "%")
 print("-----------------")
-
